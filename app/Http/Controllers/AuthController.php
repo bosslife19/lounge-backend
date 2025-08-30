@@ -121,6 +121,12 @@ public function resendEmailOtp(Request $request)
                     ->subject('Email Verification Code');
         });
          $user->password_otp = $code;
+          
+         EmailVerification::create([
+            'user_id' => $user->id,
+            'email'=>$user->email,
+            'code'=>$code,
+         ]);
          $user->save();
 
         // Save the code in the database associated with the user
