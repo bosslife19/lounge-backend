@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Organization;
+use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -79,5 +81,33 @@ class UserController extends Controller
 
     return response()->json(['status'=>true, 'message'=>'Profile Picture Updated Successfully', 'user'=>$user]);
 
+    }
+
+    public function getAllUsers(Request $request){
+        $users = User::where('id', '!=', $request->user()->id)->get();
+
+        return response()->json(['users'=>$users, 'status'=>true]);
+    }
+
+
+    public function changePassword(Request $request){
+        try {
+            //code...
+            $request->validate(['currentPassword'=>'required', 'newPassword'=>'required']);
+
+            $user = $request->user();
+
+            $samePassword = Hash::check($request->currentPassword, $user->password);
+            if($samePassword){
+                $user->password = Hash::make($request->newPassword);
+                $user->save();
+                return response()->json(['status'=>true, 'message'=>'Password Changed Successfully']);
+            }else{
+                return response()->json(['error'=>'The current password entered is not correct']);
+            }
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(['message'=>$th->getMessage()]);
+        }
     }
 }

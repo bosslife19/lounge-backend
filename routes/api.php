@@ -32,4 +32,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/upload-post', [PostController::class, 'uploadPost']);
     Route::get('/get-all-posts', [PostController::class, 'getAllPosts']);
     Route::post('/comment', [CommentController::class,'addComment']);
+    Route::get('/users', [UserController::class, 'getAllUsers']);
+    Route::post('/change-password', [UserController::class, 'changePassword']);
+    Route::get('/posts/{id}', [PostController::class, 'getUserPosts']);
+    Route::delete('/posts/{id}', [PostController::class, 'deletePost']);
+   
 });

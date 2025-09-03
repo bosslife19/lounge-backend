@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -23,8 +24,38 @@ class PostController extends Controller
         }
     }
 
-    public function getAllPosts(){
-        $posts = \App\Models\Post::with(['user', 'comments'])->latest()->get();
-        return response()->json(['status'=>true, 'posts'=>$posts]);
+   public function getAllPosts()
+{
+    $posts = \App\Models\Post::with([
+        'user',
+        'comments' => function ($query) {
+            $query->latest(); // orders comments by created_at descending
+        }
+    ])
+    ->latest()
+    ->get();
+
+    return response()->json(['status' => true, 'posts' => $posts]);
+}
+
+public function getUserPosts($id){
+    $user = User::find($id);
+
+    $posts = $user->posts()->with('comments')->get();
+
+    return response()->json(['status'=>true, 'posts'=>$posts]);
+}
+
+public function deletePost($id){
+    $post = \App\Models\Post::find($id);
+
+    if(!$post){
+        return response()->json(['status'=>false, 'error'=>'Post not found']);
     }
+
+    $post->delete();
+
+    return response()->json(['status'=>true, 'message'=>'Post deleted successfully']);  
+}
+
 }
