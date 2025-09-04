@@ -16,9 +16,13 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
 
         User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'wokodavid001@gmail.com',
+            'name' => 'admin',
+            'email' => 'admin@admin.com',
+            'role' => 'admin',
+            'password' => bcrypt('1234'), 
+            "profile_picture" => 'https://ui-avatars.com/api/?name=Admin&background=random&size=128',
+
         ]);
-        User::factory()->count(10)->create();
+        User::factory()->count(1)->create();
     }
 }
