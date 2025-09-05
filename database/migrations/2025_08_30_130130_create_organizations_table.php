@@ -14,6 +14,12 @@ return new class extends Migration
         Schema::create('organizations', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('description');
+            $table->string('logo');
+            $table->string('email');
+            $table->string('website_url');
+            $table->string('location');
+           
             $table->timestamps();
         });
     }

@@ -33,21 +33,25 @@ class UserController extends Controller
 
         }
         if($request->organizationName){
-        //   $organization =   Organization::create([
-        //         'name'=>$request->organizationName
-        //   ]);
+           
+          $organization =   Organization::create([
+                'name'=>$request->organizationName,
+                'description'=>$request->organizationDescription,
+                'logo'=>$request->organizationLogo,
+                'email'=>$request->organizationEmail,
+                'website_url'=>$request->organizationWebsite,
+                'location'=>$request->organizationLocation,
+                'status'=>'pending',
+          ]);
 
-        //   $user->organization_id = $organization->id;
+       $user->organization_id = $organization->id;
             $user->requests()->create([
                 'type'=>'create_organization',
                 'description'=>'Request to create organization: '.$request->organizationName,
                 'status'=>'pending'
             ]);
 
-            Organization::create([
-                'name'=>$request->organizationName,
-                'status'=>"pending"
-            ]);
+           
         }
 
         if($request->organization){
@@ -84,7 +88,7 @@ class UserController extends Controller
     }
 
     public function getAllUsers(Request $request){
-        $users = User::where('id', '!=', $request->user()->id)->get();
+        $users = User::where('id', '!=', $request->user()->id)->where('role', '!=', 'admin')->get();
 
         return response()->json(['users'=>$users, 'status'=>true]);
     }
