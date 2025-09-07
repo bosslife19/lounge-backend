@@ -36,6 +36,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile/upload', [UserController::class, 'uploadProfilePicture']);
     Route::get('/get-organizations', [OrganizationController::class, 'getOrganizations']);
     Route::post('/upload-post', [PostController::class, 'uploadPost']);
+    Route::post('/upload-post-admin', [AdminController::class, 'uploadPost']);
+    Route::get('/get-admin-posts', [AdminController::class, 'getPosts']);
     Route::get('/get-mentors', [AdminController::class, 'getMentors']);
     Route::get('/get-organizations', [AdminController::class, 'getOrganizations']);
     Route::get('/get-all-posts', [PostController::class, 'getAllPosts']);

@@ -62,4 +62,26 @@ class AdminController extends Controller
 
         return response()->json(['status'=>true, 'organizations'=>$organizations]);
     }
+    public function uploadPost(Request $request){
+        try {
+            $request->validate(['body'=>'required']);
+
+            $user = $request->user();
+           $post =  $user->posts()->create([
+                'body'=>$request->body,
+                'post_image'=>$request->image,
+            ]);
+
+            return response()->json(['status'=>true, 'message'=>'Post uploaded successfully', 'post'=>$post]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(['message'=>$th->getMessage()]);
+        }
+    }
+
+    public function getPosts(Request $request){
+     $user = $request->user();
+     $posts = $user->posts;
+     return response()->json(['status'=>true, 'posts'=>$posts]);
+    }
 }

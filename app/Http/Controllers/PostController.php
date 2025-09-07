@@ -12,12 +12,12 @@ class PostController extends Controller
             $request->validate(['body'=>'required']);
 
             $user = $request->user();
-            $user->posts()->create([
+           $post =  $user->posts()->create([
                 'body'=>$request->body,
                 'post_image'=>$request->image,
             ]);
 
-            return response()->json(['status'=>true, 'message'=>'Post uploaded successfully']);
+            return response()->json(['status'=>true, 'message'=>'Post uploaded successfully', 'post'=>$post]);
         } catch (\Throwable $th) {
             //throw $th;
             return response()->json(['message'=>$th->getMessage()]);
