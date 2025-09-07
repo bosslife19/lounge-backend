@@ -16,6 +16,10 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->enum('type', ['become_mentor', 'create_organization']);
             $table->text('description');
+                        $table->string('name');
+            $table->string('logo');
+            $table->string('website');
+            $table->string('email');
             $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
         });

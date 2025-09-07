@@ -41,6 +41,13 @@ public function organization()
 {
     return $this->belongsTo(Organization::class);
 }
+
+public function mentors (){
+    return $this->belongsToMany(Mentor::class, 'mentor_user');
+}
+public function mentorRequest(){
+    return $this->hasOne(MentorRequest::class);
+}
     /**
      * The attributes that should be hidden for serialization.
      *

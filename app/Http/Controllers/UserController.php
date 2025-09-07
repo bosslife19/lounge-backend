@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\MentorRequest;
 use App\Models\Organization;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -33,7 +34,7 @@ class UserController extends Controller
 
         }
         if($request->organizationName){
-           
+         
           $organization =   Organization::create([
                 'name'=>$request->organizationName,
                 'description'=>$request->organizationDescription,
@@ -47,6 +48,10 @@ class UserController extends Controller
        $user->organization_id = $organization->id;
             $user->requests()->create([
                 'type'=>'create_organization',
+                'name'=>$organization->name,
+                'logo'=>$organization->logo,
+                'email'=>$organization->email,
+                'website'=>$organization->website_url,
                 'description'=>'Request to create organization: '.$request->organizationName,
                 'status'=>'pending'
             ]);
@@ -73,7 +78,19 @@ class UserController extends Controller
 
         
     }
+public function requestToMentor(Request $request){
+    $user = $request->user();
+    $exists = MentorRequest::where('user_id', $user->id)->first();
+    if($exists){
+        return response()->json(['error'=>'You have already sent a mentorship request']);
+    }
+    $user->mentorRequest()->create([
+        'years_of_experience'=>$user->years_of_experience,
+        'name'=>$user->name
+    ]);
 
+    return response()->json(['status'=>true, 'message'=>'Mentor Request sent successfully. We are currently reviewing your request']);
+}
     public function uploadProfilePicture(Request $request){
       $validated = $request->validate([
             'profilePic' => 'required|string',
