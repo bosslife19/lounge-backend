@@ -39,13 +39,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/upload-post-admin', [AdminController::class, 'uploadPost']);
     Route::get('/get-admin-posts', [AdminController::class, 'getPosts']);
     Route::get('/get-mentors', [AdminController::class, 'getMentors']);
-    Route::get('/get-organizations', [AdminController::class, 'getOrganizations']);
+    // Route::get('/get-organizations', [AdminController::class, 'getOrganizations']);
     Route::get('/get-all-posts', [PostController::class, 'getAllPosts']);
     Route::post('/comment', [CommentController::class,'addComment']);
     Route::get('/users', [UserController::class, 'getAllUsers']);
     Route::post('/change-password', [UserController::class, 'changePassword']);
     Route::get('/posts/{id}', [PostController::class, 'getUserPosts']);
     Route::delete('/posts/{id}', [PostController::class, 'deletePost']);
+    Route::post('/upload-article', [AdminController::class, 'uploadArticle']);
+    Route::get('/get-articles', [AdminController::class, 'getArticles']);
+    Route::post('/delete-article', [AdminController::class, 'deleteArticle']);
+    Route::post('/update-admin-email', [AdminController::class, 'updateEmail']);
+    Route::post('/update-admin-password', [AdminController::class, 'updateAdminPassword']);
+    Route::post('/remove-organization', [AdminController::class, 'removeOrganization']);
     
    
 });

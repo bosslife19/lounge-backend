@@ -45,6 +45,9 @@ public function organization()
 public function mentors (){
     return $this->belongsToMany(Mentor::class, 'mentor_user');
 }
+public function contents(){
+    return $this->hasMany(Content::class);
+}
 public function mentorRequest(){
     return $this->hasOne(MentorRequest::class);
 }

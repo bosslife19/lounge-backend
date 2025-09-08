@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Content;
 use App\Models\MentorRequest;
 use App\Models\Organization;
 use App\Models\Request as ModelsRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
@@ -13,6 +15,30 @@ class AdminController extends Controller
         $requests = ModelsRequest::with('user')->where('status', 'pending')->where('type', 'create_organization')->get();
 
         return response()->json(['status'=>true, 'requests'=>$requests]);
+    }
+public function removeOrganization(Request $request){
+    $organization = Organization::find($request->orgId);
+    $organization->status = 'rejected';
+    $organization->save();
+    return response()->json(['status'=>true]);
+}
+    public function uploadArticle(Request $request){
+        try {
+           
+           
+          $request->validate(['title'=>'required', 'content'=>'required']);
+          $user = $request->user();
+          $content = $user->contents()->create([
+            'title'=>$request->title,
+            'link'=>$request->link,
+            'image'=>$request->image,
+            'content'=>$request->content
+          ]);
+          return response()->json(['status'=>true, 'article'=>$content]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(['error'=>$th->getMessage()]);
+        }
     }
 
     public function getAllMentorRequests(){
@@ -83,5 +109,41 @@ class AdminController extends Controller
      $user = $request->user();
      $posts = $user->posts;
      return response()->json(['status'=>true, 'posts'=>$posts]);
+    }
+
+    public function getArticles(Request $request){
+        $user = $request->user();
+        $articles = $user->contents()->latest()->get();
+        return response()->json(['articles'=>$articles, 'status'=>true]);
+    }
+    public function deleteArticle(Request $request){
+        $article = Content::find($request->articleId);
+        $article->delete();
+        return response()->json(['status'=>true]);
+    }
+    public function updateEmail(Request $request){
+        try {
+            //code...
+            $request->validate(['email'=>'required']);
+            $user = $request->user();
+            $user->email = $request->email;
+            $user->save();
+            return response()->json(['status'=>true], 200);
+        
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(['error'=>$th->getMessage()]);
+        }
+    }
+
+    public function updateAdminPassword(Request $request){
+        $user = $request->user();
+        $passwordSame = Hash::check($request->currentPassword, $user->password);
+        if(!$passwordSame){
+            return response()->json(['error'=>'Current password is incorrect.']);
+        }
+        $user->password = Hash::make($request->newPassword);
+        $user->save();
+        return response()->json(['status'=>true]);
     }
 }

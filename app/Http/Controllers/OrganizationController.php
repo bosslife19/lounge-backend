@@ -8,7 +8,7 @@ class OrganizationController extends Controller
 {
     public function getOrganizations()
     {
-        $organizations = \App\Models\Organization::where('status', 'approved')->get();
+        $organizations = \App\Models\Organization::with('users')->where('status', 'approved')->get();
 
         return response()->json(['status' => true, 'organizations' => $organizations]);
     }
