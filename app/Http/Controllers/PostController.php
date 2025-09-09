@@ -22,6 +22,15 @@ class PostController extends Controller
             //throw $th;
             return response()->json(['message'=>$th->getMessage()]);
         }
+
+
+    }
+
+    
+    public function getArticles(){
+        $user = User::where('role', 'admin')->first();
+        $articles = $user->contents()->latest()->get();
+        return response()->json(['articles'=>$articles, 'status'=>true]);
     }
 
    public function getAllPosts()

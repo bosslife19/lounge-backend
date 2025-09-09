@@ -60,8 +60,10 @@ class UserController extends Controller
         }
 
         if($request->organization){
+            \Log::info('heree');
             $organization = Organization::where('name', $request->organization)->first();
             $user->organization_id = $organization ? $organization->id : null;
+
 
         }
         $user->profile_status = 'complete';

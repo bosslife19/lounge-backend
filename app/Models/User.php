@@ -50,6 +50,10 @@ public function contents(){
 }
 public function mentorRequest(){
     return $this->hasOne(MentorRequest::class);
+
+}
+public function mentorListing(){
+    return $this->hasOne(MentorListing::class);
 }
     /**
      * The attributes that should be hidden for serialization.

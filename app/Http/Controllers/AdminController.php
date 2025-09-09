@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Content;
+use App\Models\Event;
 use App\Models\MentorRequest;
 use App\Models\Organization;
 use App\Models\Request as ModelsRequest;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -20,6 +22,14 @@ public function removeOrganization(Request $request){
     $organization = Organization::find($request->orgId);
     $organization->status = 'rejected';
     $organization->save();
+    return response()->json(['status'=>true]);
+}
+public function deleteUser(Request $request){
+    $user = User::where('id', $request->userId)->first();
+    if(!$user){
+        return response()->json(['error'=>'User not found']);
+    }
+    $user->delete();
     return response()->json(['status'=>true]);
 }
     public function uploadArticle(Request $request){
@@ -56,6 +66,9 @@ public function removeOrganization(Request $request){
         }
         $mentorRequest->status = 'approved';
         $mentorRequest->save();
+        $user = User::where('id', $mentorRequest->user_id)->first();
+        $user->is_mentor = true;
+        $user->save();
 
         return response()->json(['status'=>true, 'message'=>'Mentorship request approved successfully']);
     }
@@ -111,11 +124,6 @@ public function removeOrganization(Request $request){
      return response()->json(['status'=>true, 'posts'=>$posts]);
     }
 
-    public function getArticles(Request $request){
-        $user = $request->user();
-        $articles = $user->contents()->latest()->get();
-        return response()->json(['articles'=>$articles, 'status'=>true]);
-    }
     public function deleteArticle(Request $request){
         $article = Content::find($request->articleId);
         $article->delete();
@@ -145,5 +153,28 @@ public function removeOrganization(Request $request){
         $user->password = Hash::make($request->newPassword);
         $user->save();
         return response()->json(['status'=>true]);
+    }
+
+    public function createEvent(Request $request){
+        try {
+            //code...
+
+            $request->validate(['title'=>'required', 'eventDate'=>'required', 'startTime'=>'required', 'endTime'=>'required']);
+            Event::create([
+                'title'=>$request->title,
+                'event_date'=>$request->eventDate,
+                'start_time'=>$request->startTime,
+                'end_time'=>$request->endTime,
+                'event_image'=>$request->eventImage,
+                'members_to_notify' => $request->members ?? null,
+
+            ]);
+            return response()->json(['status'=>true]);
+
+        } catch (\Throwable $th) {
+            //throw $th;
+            \Log::info($th->getMessage());
+            return response()->json(['error'=>$th->getMessage()]);
+        }
     }
 }

@@ -3,10 +3,13 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\MentorController;
+use App\Http\Controllers\MentorListingController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
+
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -38,8 +41,14 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/upload-post', [PostController::class, 'uploadPost']);
     Route::post('/upload-post-admin', [AdminController::class, 'uploadPost']);
     Route::get('/get-admin-posts', [AdminController::class, 'getPosts']);
+    Route::post('/delete-user', [AdminController::class, 'deleteUser']);
+    Route::get('/get-my-listings', [MentorListingController::class, 'getMyListings']);
     Route::get('/get-mentors', [AdminController::class, 'getMentors']);
-    // Route::get('/get-organizations', [AdminController::class, 'getOrganizations']);
+    Route::post('/create-listing', [MentorController::class, 'createListing']);
+    Route::post('/edit-listing', [MentorController::class, 'editListing']);
+    Route::get('/get-all-listings', [MentorListingController::class, 'getAllListings']);
+    Route::post('/create-event', [AdminController::class, 'createEvent']);
+    // Route::get('/get-organizations', [AdminController::class, 'getOrganizations/']);
     Route::get('/get-all-posts', [PostController::class, 'getAllPosts']);
     Route::post('/comment', [CommentController::class,'addComment']);
     Route::get('/users', [UserController::class, 'getAllUsers']);
@@ -47,7 +56,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/posts/{id}', [PostController::class, 'getUserPosts']);
     Route::delete('/posts/{id}', [PostController::class, 'deletePost']);
     Route::post('/upload-article', [AdminController::class, 'uploadArticle']);
-    Route::get('/get-articles', [AdminController::class, 'getArticles']);
+    Route::get('/get-articles', [PostController::class, 'getArticles']);
     Route::post('/delete-article', [AdminController::class, 'deleteArticle']);
     Route::post('/update-admin-email', [AdminController::class, 'updateEmail']);
     Route::post('/update-admin-password', [AdminController::class, 'updateAdminPassword']);
