@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Content;
 use App\Models\Event;
+use App\Models\MentorListing;
 use App\Models\MentorRequest;
 use App\Models\Organization;
 use App\Models\Request as ModelsRequest;
@@ -159,22 +160,53 @@ public function deleteUser(Request $request){
         try {
             //code...
 
-            $request->validate(['title'=>'required', 'eventDate'=>'required', 'startTime'=>'required', 'endTime'=>'required']);
-            Event::create([
+            $request->validate(['title'=>'required', 'eventDate'=>'required', 'startTime'=>'required', 'endTime'=>'required', 'link'=>'required']);
+          $event =   Event::create([
                 'title'=>$request->title,
                 'event_date'=>$request->eventDate,
                 'start_time'=>$request->startTime,
                 'end_time'=>$request->endTime,
                 'event_image'=>$request->eventImage,
                 'members_to_notify' => $request->members ?? null,
+                'event_link'=>$request->link
 
             ]);
-            return response()->json(['status'=>true]);
+            return response()->json(['status'=>true, 'event'=>$event]);
 
         } catch (\Throwable $th) {
             //throw $th;
             \Log::info($th->getMessage());
             return response()->json(['error'=>$th->getMessage()]);
         }
+    }
+        public function editEvent(Request $request){
+        try {
+            //code...
+
+            $request->validate(['title'=>'required', 'eventDate'=>'required', 'startTime'=>'required', 'endTime'=>'required', 'link'=>'required']);
+            $event = Event::find($request->eventId);
+          $event->update([
+                'title'=>$request->title,
+                'event_date'=>$request->eventDate,
+                'start_time'=>$request->startTime,
+                'end_time'=>$request->endTime,
+                'event_image'=>$request->eventImage,
+                'members_to_notify' => $request->members ?? null,
+                'event_link'=>$request->link
+
+            ]);
+            return response()->json(['status'=>true]);
+
+        } catch (\Throwable $th) {
+            //throw $th;
+            // \Log::info($th->getMessage());
+            return response()->json(['error'=>$th->getMessage()]);
+        }
+    }
+
+    public function deleteListing(Request $request){
+        $listing = MentorListing::find($request->listingId);
+        $listing->delete();
+        return response()->json(['status'=>true]);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Event;
 use App\Models\MentorRequest;
 use App\Models\Organization;
 use App\Models\User;
@@ -60,7 +61,7 @@ class UserController extends Controller
         }
 
         if($request->organization){
-            \Log::info('heree');
+
             $organization = Organization::where('name', $request->organization)->first();
             $user->organization_id = $organization ? $organization->id : null;
 
@@ -72,7 +73,7 @@ class UserController extends Controller
         return response()->json(['status'=>true, 'message'=>'Profile Created Successfully', 'user'=>$user]);
         } catch (\Throwable $th) {
             //throw $th;
-            \Log::info($th->getMessage());
+            // \Log::info($th->getMessage());
 
             return response()->json(['message'=>$th->getMessage()]);
 
@@ -133,6 +134,9 @@ public function requestToMentor(Request $request){
             return response()->json(['message'=>$th->getMessage()]);
         }
     }
-
+public function getEvents(){
+    $events = Event::latest()->get();
+    return response()->json(['events'=>$events, 'status'=>true], 200);
+}
 
 }

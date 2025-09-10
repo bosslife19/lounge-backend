@@ -44,10 +44,13 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/delete-user', [AdminController::class, 'deleteUser']);
     Route::get('/get-my-listings', [MentorListingController::class, 'getMyListings']);
     Route::get('/get-mentors', [AdminController::class, 'getMentors']);
+    Route::get('/get-events', [UserController::class, 'getEvents']);
     Route::post('/create-listing', [MentorController::class, 'createListing']);
     Route::post('/edit-listing', [MentorController::class, 'editListing']);
     Route::get('/get-all-listings', [MentorListingController::class, 'getAllListings']);
+    Route::post('/delete-listing', [AdminController::class, 'deleteListing']);
     Route::post('/create-event', [AdminController::class, 'createEvent']);
+    Route::post('/edit-event', [AdminController::class, 'editEvent']);
     // Route::get('/get-organizations', [AdminController::class, 'getOrganizations/']);
     Route::get('/get-all-posts', [PostController::class, 'getAllPosts']);
     Route::post('/comment', [CommentController::class,'addComment']);
