@@ -42,9 +42,7 @@ public function organization()
     return $this->belongsTo(Organization::class);
 }
 
-public function mentors (){
-    return $this->belongsToMany(Mentor::class, 'mentor_user');
-}
+
 public function contents(){
     return $this->hasMany(Content::class);
 }
@@ -55,6 +53,24 @@ public function mentorRequest(){
 public function mentorListing(){
     return $this->hasOne(MentorListing::class);
 }
+public function mentors()
+{
+    return $this->belongsToMany(\App\Models\User::class, 'mentor_user', 'user_id', 'mentor_id')
+                ->withTimestamps();
+
+}
+
+// As a mentor, get my mentees
+public function mentees()
+{
+    return $this->belongsToMany(\App\Models\User::class, 'mentor_user', 'mentor_id', 'user_id')
+                ->withTimestamps();
+
+}
+
+// As a user, get mentors
+
+
     /**
      * The attributes that should be hidden for serialization.
      *

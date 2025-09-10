@@ -57,6 +57,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users', [UserController::class, 'getAllUsers']);
     Route::post('/change-password', [UserController::class, 'changePassword']);
     Route::get('/posts/{id}', [PostController::class, 'getUserPosts']);
+    Route::post('/respond-to-match', [UserController::class, 'respondToMatch']);
     Route::delete('/posts/{id}', [PostController::class, 'deletePost']);
     Route::post('/upload-article', [AdminController::class, 'uploadArticle']);
     Route::get('/get-articles', [PostController::class, 'getArticles']);
@@ -64,6 +65,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/update-admin-email', [AdminController::class, 'updateEmail']);
     Route::post('/update-admin-password', [AdminController::class, 'updateAdminPassword']);
     Route::post('/remove-organization', [AdminController::class, 'removeOrganization']);
+    Route::get('my-mentors', [UserController::class, 'getMyMentors']);
     
    
 });

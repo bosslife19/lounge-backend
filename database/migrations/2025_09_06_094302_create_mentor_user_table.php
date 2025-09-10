@@ -11,13 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('mentor_user', function (Blueprint $table) {
-            $table->id();
-             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-    $table->foreignId('mentor_id')->constrained()->onDelete('cascade');
-            $table->timestamps();
-        });
-    }
+Schema::create('mentor_user', function (Blueprint $table) {
+    $table->id();
+
+    // The mentee (regular user)
+    $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+
+    // The mentor (also a user, but with is_mentor = true)
+    $table->foreignId('mentor_id')->constrained('users')->cascadeOnDelete();
+
+    // Optional extras
+    $table->timestamp('matched_at')->nullable(); // when match was confirmed
+    $table->timestamps();
+
+    // Ensure no duplicates
+    $table->unique(['user_id', 'mentor_id']);
+});
+
+}
 
     /**
      * Reverse the migrations.

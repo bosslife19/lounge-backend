@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\March;
 use App\Models\MentorRequest;
 use App\Models\Organization;
 use App\Models\User;
@@ -137,6 +138,45 @@ public function requestToMentor(Request $request){
 public function getEvents(){
     $events = Event::latest()->get();
     return response()->json(['events'=>$events, 'status'=>true], 200);
+}
+public function respondToMarch(March $match, User $actor, string $response)
+{
+    if ($actor->id === $match->user_id) {
+        $match->user_status = $response; // 'accepted' or 'rejected'
+    } elseif ($actor->id === $match->mentor_id) {
+        $match->mentor_status = $response;
+    } else {
+        abort(403, 'Not part of this match.');
+    }
+
+    $match->save();
+
+    // Check if both accepted
+    if ($match->user_status === 'accepted' && $match->mentor_status === 'accepted') {
+        // Bind mentor <-> user
+        $match->mentor->mentees()->syncWithoutDetaching([$match->user_id]);
+    }
+
+    // If either rejects → clean up
+    if ($match->user_status === 'rejected' || $match->mentor_status === 'rejected') {
+        $match->delete();
+    }
+
+    return $match;
+}
+
+
+public function respondToMatch(Request $request){
+    $match = March::find($request->marchId);
+    $user = User::find($request->user()->id);
+    $this->respondToMarch($match, $user, $request->response);
+    return response()->json(['status'=>true]);
+}
+public function getMyMentors(Request $request){
+    $user = $request->user();
+    $mentors = $user->mentors;
+    return response()->json(['mentors'=>$mentors]);
+
 }
 
 }
