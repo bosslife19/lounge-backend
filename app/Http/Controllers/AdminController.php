@@ -15,6 +15,16 @@ use Illuminate\Support\Facades\Hash;
 
 class AdminController extends Controller
 {
+     public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            if ($request->user()->role=='admin') {
+                return $next($request);
+            }
+            return response()->json(['error'=>'Unauthorized'], 403);
+            
+        });
+    }
     public function getOrganizationRequests(Request $request){
         $requests = ModelsRequest::with('user')->where('status', 'pending')->where('type', 'create_organization')->get();
 
