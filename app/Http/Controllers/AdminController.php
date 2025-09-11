@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Services\MentorMatchingService;
 use App\Models\Content;
 use App\Models\Event;
 use App\Models\MentorListing;
@@ -59,9 +60,14 @@ public function deleteUser(Request $request){
 
     public function approveMentor(Request $request){
         $mentorRequest = MentorRequest::find($request->requestId);
+         $userId = $mentorRequest->user->id;
         if(!$request->approved){
              $mentorRequest->status = 'rejected';
         $mentorRequest->save();
+       
+
+        $notify = (new MentorMatchingService())->sendNotify($userId, 'Rejected', 'Your mentorship request has been rejected');
+
 
         return response()->json(['status'=>true]);
         }
@@ -70,6 +76,7 @@ public function deleteUser(Request $request){
         $user = User::where('id', $mentorRequest->user_id)->first();
         $user->is_mentor = true;
         $user->save();
+        (new MentorMatchingService())->sendNotify($userId, 'Congratulations!', 'Your mentorship request has been accepted');
 
         return response()->json(['status'=>true, 'message'=>'Mentorship request approved successfully']);
     }
@@ -79,6 +86,8 @@ public function deleteUser(Request $request){
         if($request->approved==false){
             $orgRequest->status = "rejected";
         $orgRequest->save();
+
+        (new MentorMatchingService())->sendNotify($orgRequest->user->id,'Organization Request Rejected', 'Your request to create an organization has been rejected after review');
         
 
         return response()->json(['status'=>true]);
@@ -89,6 +98,7 @@ public function deleteUser(Request $request){
         $organization = Organization::where('name', $orgRequest->name)->where('email', $orgRequest->email)->first();
         $organization->status = "approved";
         $organization->save();
+        (new MentorMatchingService())->sendNotify($orgRequest->user->id,'Organization Request Accepted', 'Your request to create an organization has been accepted after review');
 
         return response()->json(['status'=>true]);
     }

@@ -2,13 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Services\MentorMatchingService;
+use App\Mail\UserMatching;
 use App\Models\Event;
 use App\Models\March;
+use App\Models\MentorMatch;
 use App\Models\MentorRequest;
 use App\Models\Organization;
+use App\Models\SessionRequest;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class UserController extends Controller
 {
@@ -154,11 +159,24 @@ public function respondToMarch(March $match, User $actor, string $response)
     // Check if both accepted
     if ($match->user_status === 'accepted' && $match->mentor_status === 'accepted') {
         // Bind mentor <-> user
+        $mentee = User::find($match->user_id);
+        $mentor = User::find($match->mentor_id);
+        (new MentorMatchingService())->sendNotify($mentor->id,"You are now $mentee->first_name's mentor", "$mentee->first_name is now your latest mentee");
+        (new MentorMatchingService())->sendNotify($mentee->id,"You are now $mentor->first_name's mentee", "$mentor->first_name is now your latest mentor");
+         try {
+    //code...
+     Mail::to($mentee->email)->send(new UserMatching('New Mentor Notification', "$mentor->first_name $mentor->last_name is now your new mentor. you can contact him via his email $mentor->email to set up a meeting and connect", $mentee->name));
+     Mail::to($mentor->email)->send(new UserMatching('New Mentor Notification', "$mentee->first_name $mentee->last_name is now your new mentee. you can contact him via his email $mentee->email to set up a meeting and connect", $mentor->name));
+ } catch (\Throwable $th) {
+    //throw $th;
+    \Log::info($th->getMessage());
+ }
         $match->mentor->mentees()->syncWithoutDetaching([$match->user_id]);
     }
 
     // If either rejects → clean up
     if ($match->user_status === 'rejected' || $match->mentor_status === 'rejected') {
+        
         $match->delete();
     }
 
@@ -168,15 +186,72 @@ public function respondToMarch(March $match, User $actor, string $response)
 
 public function respondToMatch(Request $request){
     $match = March::find($request->marchId);
+  
     $user = User::find($request->user()->id);
     $this->respondToMarch($match, $user, $request->response);
-    return response()->json(['status'=>true]);
+   $delete= (new MentorMatchingService())->deleteNotify($request->notId);
+   if($user->id != $match->mentor_id && $request->response=='accepted'){
+(new MentorMatchingService())->sendNotify($match->mentor_id,'Mentorship match accepted', "$user->name has acccepted to be your mentee");
+   }
+   if($user->id == $match->mentor_id && $request->response=='accepted'){
+(new MentorMatchingService())->sendNotify($match->user_id,'Mentorship match accepted', "$user->name has acccepted to be your mentor");
+   }
+   
+   
+   if($delete){
+return response()->json(['status'=>true]);
+   }
+   return response()->json(['error'=>'Server Error']);
+    
 }
 public function getMyMentors(Request $request){
     $user = $request->user();
     $mentors = $user->mentors;
     return response()->json(['mentors'=>$mentors]);
 
+}
+public function readNotification(Request $request){
+    $delete= (new MentorMatchingService())->deleteNotify($request->notId);
+    if($delete){
+        return response()->json(['status'=>true]);
+    }
+    return response()->json(['error'=>'Server Error']);
+}
+
+public function requestSession(Request $request){
+    $user = $request->user();
+    $mentor = User::find($request->mentorId);
+
+    if($request->user()->id == $request->mentorId) return response()->json(['error'=>'You cannot request yourself as mentor']);
+    $sessionRequest = new SessionRequest();
+    $exists = $sessionRequest->where('user_id', $user->id)->where('mentor_id', $request->mentorId)->first();
+    if($exists){
+        return response()->json(['error'=>'You cannot request for a session twice with this mentor']);
+    }
+ $sessionRequest->create([
+    'user_id'=>$user->id,
+    'mentor_id'=>$request->mentorId,
+ ]);
+ MentorMatch::updateOrCreate(
+                    ['user_id' => $user->id],
+                    ['mentor_id' => $request->mentorId]
+                );
+$match =  March::create([
+    'user_id'   => $user->id,
+    'mentor_id' => $request->mentorId,
+    'user_status'=>'accepted'
+]);
+
+ (new MentorMatchingService())->sendNotification($request->mentorId,'Session Request', "$user->name has requested a session with you", $user->profile_picture,$user->profession, $user->first_name, $match->id);
+ try {
+    //code...
+     Mail::to($mentor->email)->send(new UserMatching('Session Request', "$user->first_name $user->last_name has requested a session with you", $mentor->name));
+ } catch (\Throwable $th) {
+    //throw $th;
+    \Log::info($th->getMessage());
+ }
+
+ return response()->json(['status'=>true]);
 }
 
 }

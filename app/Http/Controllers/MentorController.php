@@ -11,7 +11,7 @@ class MentorController extends Controller
 
       public function createListing(Request $request){
         try {
-            $request->validate(['accessEmail'=>'required', 'description'=>'required', 'calendly'=>'required', 'title'=>'required']);
+            $request->validate(['accessEmail'=>'required', 'description'=>'required', 'calendly'=>'required', 'title'=>'required', 'category'=>'required']);
             $user = $request->user();
             if(!$user->is_mentor){
                 return response()->json(['error'=>'Only users approved as mentors can create listings']);
@@ -28,6 +28,7 @@ class MentorController extends Controller
                 'is_free'=>$request->isFree,
                 'calendly'=>$request->calendly,
                 'preparation_notice'=>$request->preparatoryNote,
+                'category'=>$request->category,
 
             ]);
             return response()->json(['status'=>true]);

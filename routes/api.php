@@ -51,6 +51,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/delete-listing', [AdminController::class, 'deleteListing']);
     Route::post('/create-event', [AdminController::class, 'createEvent']);
     Route::post('/edit-event', [AdminController::class, 'editEvent']);
+    Route::post('/request-session', [UserController::class, 'requestSession']);
     // Route::get('/get-organizations', [AdminController::class, 'getOrganizations/']);
     Route::get('/get-all-posts', [PostController::class, 'getAllPosts']);
     Route::post('/comment', [CommentController::class,'addComment']);
@@ -66,6 +67,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/update-admin-password', [AdminController::class, 'updateAdminPassword']);
     Route::post('/remove-organization', [AdminController::class, 'removeOrganization']);
     Route::get('my-mentors', [UserController::class, 'getMyMentors']);
+    Route::post('/read-notification', [UserController::class, 'readNotification']);
     
    
 });

@@ -18,6 +18,7 @@ class MatchMentors extends Command
 
     public function handle(MentorMatchingService $service)
     {
+       
         $service->run();
         $this->info('Mentor matching completed successfully.');
     }
