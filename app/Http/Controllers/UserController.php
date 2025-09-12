@@ -144,7 +144,7 @@ public function getEvents(){
     $events = Event::latest()->get();
     return response()->json(['events'=>$events, 'status'=>true], 200);
 }
-public function respondToMarch(March $match, User $actor, string $response)
+public function respondToMarch(March $match, User $actor, string $response, $isMeeting)
 {
     if ($actor->id === $match->user_id) {
         $match->user_status = $response; // 'accepted' or 'rejected'
@@ -159,6 +159,26 @@ public function respondToMarch(March $match, User $actor, string $response)
     // Check if both accepted
     if ($match->user_status === 'accepted' && $match->mentor_status === 'accepted') {
         // Bind mentor <-> user
+        if($isMeeting){
+        $mentee = User::find($match->user_id);
+        $mentor = User::find($match->mentor_id);
+        (new MentorMatchingService())->sendNotify($mentor->id,"You are now scheduled for a 15 minute call with $mentee->first_name", "We have sent you $mentee->first_name's email to your email inbox, please contact and confirm appointment");
+        (new MentorMatchingService())->sendNotify($mentee->id,"You are now scheduled for a 15 minute call with $mentor->first_name", "We have sent you $mentor->first_name's email to your email inbox, please contact and confirm appointment");
+        $mentor->points = $mentor->points +20;
+        $mentee->points = $mentee->points + 5;
+        $mentor->save();
+        $mentee->save();
+         try {
+    //code...
+     Mail::to($mentee->email)->send(new UserMatching('New Matching Notification', "You have been scheduled for a 15 minute call with $mentor->first_name $mentor->last_name. you can contact him via his email $mentor->email to set up a meeting and connect", $mentee->name));
+     Mail::to($mentor->email)->send(new UserMatching('New Matching Notification', "You have been scheduled for a 15 minute call with $mentee->first_name $mentee->last_name. you can contact him via his email $mentee->email to set up a meeting and connect", $mentor->name));
+     return $match;
+ } catch (\Throwable $th) {
+    //throw $th;
+    \Log::info($th->getMessage());
+ }
+        }
+        
         $mentee = User::find($match->user_id);
         $mentor = User::find($match->mentor_id);
         (new MentorMatchingService())->sendNotify($mentor->id,"You are now $mentee->first_name's mentor", "$mentee->first_name is now your latest mentee");
@@ -188,13 +208,19 @@ public function respondToMatch(Request $request){
     $match = March::find($request->marchId);
   
     $user = User::find($request->user()->id);
-    $this->respondToMarch($match, $user, $request->response);
+    $this->respondToMarch($match, $user, $request->response, $request->isMeeting);
    $delete= (new MentorMatchingService())->deleteNotify($request->notId);
-   if($user->id != $match->mentor_id && $request->response=='accepted'){
+   if($user->id != $match->mentor_id && $request->response=='accepted' && !$request->isMeeting){
 (new MentorMatchingService())->sendNotify($match->mentor_id,'Mentorship match accepted', "$user->name has acccepted to be your mentee");
    }
-   if($user->id == $match->mentor_id && $request->response=='accepted'){
+   if($user->id == $match->mentor_id && $request->response=='accepted' &&!$request->isMeeting){
 (new MentorMatchingService())->sendNotify($match->user_id,'Mentorship match accepted', "$user->name has acccepted to be your mentor");
+   }
+      if($user->id != $match->mentor_id && $request->response=='accepted' &&$request->isMeeting){
+(new MentorMatchingService())->sendNotify($match->mentor_id,'Meeting match accepted', "$user->name has acccepted to be in a fifteen minute call with you");
+   }
+   if($user->id == $match->mentor_id && $request->response=='accepted' && $request->isMeeting){
+(new MentorMatchingService())->sendNotify($match->user_id,'Meeting match accepted', "$user->name has acccepted to be in a meeting with you");
    }
    
    
@@ -242,7 +268,7 @@ $match =  March::create([
     'user_status'=>'accepted'
 ]);
 
- (new MentorMatchingService())->sendNotification($request->mentorId,'Session Request', "$user->name has requested a session with you", $user->profile_picture,$user->profession, $user->first_name, $match->id);
+ (new MentorMatchingService())->sendNotification($request->mentorId,'Session Request', "$user->name has requested a session with you", $user->profile_picture,$user->profession, $user->first_name, $match->id, false);
  try {
     //code...
      Mail::to($mentor->email)->send(new UserMatching('Session Request', "$user->first_name $user->last_name has requested a session with you", $mentor->name));
@@ -252,6 +278,17 @@ $match =  March::create([
  }
 
  return response()->json(['status'=>true]);
+}
+
+public function optInForRoulette(Request $request){
+    $user = $request->user();
+    if($user->opted_in){
+        return response()->json(['error'=>"You have already opted in for this week's roulette"]);
+    }
+    $user->opted_in = true;
+    
+    $user->save();
+    return response()->json(['status'=>true]);
 }
 
 }

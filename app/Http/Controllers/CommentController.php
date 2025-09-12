@@ -14,13 +14,17 @@ class CommentController extends Controller
             ]);
 
             $user = $request->user();
-            \Log::info($user);
+
             $user->comments()->create([
                 'post_id'=>$request->post_id,
                 'body'=>$request->body,
                 'user_name'=>$user->first_name.' '.$user->last_name,
                 'user_profile_picture'=>$user->profile_picture,
             ]);
+             if($user->role !='admin'){
+                $user->points = $user->points +2;
+                $user->save();
+            }
 
             return response()->json(['status'=>true, 'message'=>'Comment added successfully']);
         }catch (\Throwable $th) {

@@ -13,12 +13,12 @@ class MentorMatchingService
 {
     public function run()
     {
-        $users = User::where('is_mentor', false)->get();
+        $users = User::where('is_mentor', false)->where('opted_in', true)->get();
    
         
         foreach ($users as $user) {
             $mentor = User::where('profession', $user->profession)
-                ->where('is_mentor', true)
+                ->where('is_mentor', true)->where('opted_in', true)
                 
                 ->inRandomOrder()
                 ->first();
@@ -35,22 +35,29 @@ $match = March::create([
     'mentor_id' => $mentor->id,
 ]);
                 // Send notifications to Supabase
-                $this->sendNotification($user->id, 'Mentor Match', "You’ve been matched to be {$mentor->first_name} {$mentor->last_name}'s mentee", $mentor->profile_picture, $mentor->profession,$mentor->first_name, $match->id);
+                $this->sendNotification($user->id, 'Call Matching', "You’ve been matched to be in a 15 minute call with {$mentor->first_name} {$mentor->last_name}", $mentor->profile_picture, $mentor->profession,$mentor->first_name, $match->id, true);
 
-                $this->sendNotification($mentor->id, 'Mentor Match', "You’ve been matched to mentor {$user->first_name} {$user->last_name}", $user->profile_picture, $user->profession, $user->first_name, $match->id);
+                $this->sendNotification($mentor->id, 'Call Matching', "You’ve been matched to be in a 15 minute call with {$user->first_name} {$user->last_name}", $user->profile_picture, $user->profession, $user->first_name, $match->id, true);
                 try {
                     //code...
-                     Mail::to($user->email)->send(new UserMatching('New Weekly Matching', "You have been matched to be $mentor->first_name $mentor->last_name's mentee", $user->name));
-                     Mail::to($mentor->email)->send(new UserMatching('New Weekly Matching', "You have been matched to be $user->first_name $user->last_name's mentor", $mentor->name));
+                     Mail::to($user->email)->send(new UserMatching('New Weekly Matching', "You have been matched to be in a 15 minute call with $mentor->first_name $mentor->last_name, this is his email $mentor->email", $user->name));
+                     Mail::to($mentor->email)->send(new UserMatching('New Weekly Matching', "You have been matched to be in a 15 minute call with $user->first_name $user->last_name, this is his email $user->email", $mentor->name));
                 } catch (\Throwable $th) {
                     //throw $th;
                     \Log::info($th->getMessage());
                 }
+                $user->opted_in = false;
+                $user->points = $user->points + 10;
+                
+                $user->save();
+                $mentor->points = $mentor->points + 10;
+                $mentor->opted_in = false;
+                $mentor->save();
             }
         }
     }
 
-    public function sendNotification($userId, $title, $message, $profile_picture, $profession,$first_name, $match_id)
+    public function sendNotification($userId, $title, $message, $profile_picture, $profession,$first_name, $match_id, $is_meeting)
     {
         $supabaseUrl = env('SUPABASE_URL');
         $supabaseKey = env('SUPABASE_KEY');
@@ -67,7 +74,8 @@ $match = March::create([
             'profession'=>$profession,
             'profile_picture'=>$profile_picture,
             'first_name'=>$first_name,
-            'match_id'=>$match_id
+            'match_id'=>$match_id,
+            'is_meeting'=>$is_meeting
 
             
         ]);

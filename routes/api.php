@@ -49,6 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/edit-listing', [MentorController::class, 'editListing']);
     Route::get('/get-all-listings', [MentorListingController::class, 'getAllListings']);
     Route::post('/delete-listing', [AdminController::class, 'deleteListing']);
+    Route::post('/opt-in', [UserController::class, 'optInForRoulette']);
     Route::post('/create-event', [AdminController::class, 'createEvent']);
     Route::post('/edit-event', [AdminController::class, 'editEvent']);
     Route::post('/request-session', [UserController::class, 'requestSession']);

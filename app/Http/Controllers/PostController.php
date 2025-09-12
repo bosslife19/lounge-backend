@@ -16,6 +16,10 @@ class PostController extends Controller
                 'body'=>$request->body,
                 'post_image'=>$request->image,
             ]);
+             if($user->role !='admin'){
+                $user->points = $user->points +2;
+                $user->save();
+            }
 
             return response()->json(['status'=>true, 'message'=>'Post uploaded successfully', 'post'=>$post]);
         } catch (\Throwable $th) {

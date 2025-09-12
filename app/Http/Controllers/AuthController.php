@@ -59,8 +59,13 @@ public function login(Request $request)
             $token = $user->createToken('auth_token')->plainTextToken;
 
             $user->last_visited = now();
-
-            $user->save();
+   
+            
+            if($user->role !='admin'){
+                $user->points = $user->points +2;
+            }
+             $user->save();
+        
 
             return response()->json([
                 'message' => 'Login successful.',
