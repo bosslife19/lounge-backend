@@ -48,9 +48,19 @@ $match = March::create([
                 }
                 $user->opted_in = false;
                 $user->points = $user->points + 10;
+                $user->pointHistories()->create([
+                    'title'=>'Call Match',
+                    'description'=>'You participated in the weekly roulette and has been matched',
+                    'addition'=>'+10',
+                ]);
                 
                 $user->save();
                 $mentor->points = $mentor->points + 10;
+                $mentor->pointHistories()->create([
+                    'title'=>'Call Match',
+                    'description'=>'You participated in the weekly roulette and has been matched',
+                    'addition'=>'+10',
+                ]);
                 $mentor->opted_in = false;
                 $mentor->save();
             }

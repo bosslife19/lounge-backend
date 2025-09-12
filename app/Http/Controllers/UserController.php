@@ -165,7 +165,17 @@ public function respondToMarch(March $match, User $actor, string $response, $isM
         (new MentorMatchingService())->sendNotify($mentor->id,"You are now scheduled for a 15 minute call with $mentee->first_name", "We have sent you $mentee->first_name's email to your email inbox, please contact and confirm appointment");
         (new MentorMatchingService())->sendNotify($mentee->id,"You are now scheduled for a 15 minute call with $mentor->first_name", "We have sent you $mentor->first_name's email to your email inbox, please contact and confirm appointment");
         $mentor->points = $mentor->points +20;
+        $mentor->pointHistories()->create([
+                    'title'=>'Call Scheduled',
+                    'description'=>'You were Scheduled for a 15 minute mentoring call',
+                    'addition'=>'+20',
+                ]);
         $mentee->points = $mentee->points + 5;
+        $mentee->pointHistories()->create([
+                    'title'=>'Call Scheduled',
+                    'description'=>'You were Scheduled for a 15 minute call with a mentor',
+                    'addition'=>'+5',
+                ]);
         $mentor->save();
         $mentee->save();
          try {
@@ -235,6 +245,11 @@ public function getMyMentors(Request $request){
     $mentors = $user->mentors;
     return response()->json(['mentors'=>$mentors]);
 
+}
+public function getUserPointHistories($id){
+    $user = User::find($id);
+    $histories = $user->pointHistories;
+    return response()->json(['histories'=>$histories], 200);
 }
 public function readNotification(Request $request){
     $delete= (new MentorMatchingService())->deleteNotify($request->notId);

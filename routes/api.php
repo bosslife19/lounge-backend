@@ -62,6 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/respond-to-match', [UserController::class, 'respondToMatch']);
     Route::delete('/posts/{id}', [PostController::class, 'deletePost']);
     Route::post('/upload-article', [AdminController::class, 'uploadArticle']);
+    Route::get('/points-histories/{id}', [UserController::class, 'getUserPointHistories']);
     Route::get('/get-articles', [PostController::class, 'getArticles']);
     Route::post('/delete-article', [AdminController::class, 'deleteArticle']);
     Route::post('/update-admin-email', [AdminController::class, 'updateEmail']);

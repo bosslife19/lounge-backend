@@ -23,6 +23,11 @@ class CommentController extends Controller
             ]);
              if($user->role !='admin'){
                 $user->points = $user->points +2;
+                $user->pointHistories()->create([
+                    'title'=>'Posts Comment',
+                    'description'=>'You Commented on a post',
+                    'addition'=>'+3',
+                ]);
                 $user->save();
             }
 

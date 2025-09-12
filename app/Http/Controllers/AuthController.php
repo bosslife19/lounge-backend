@@ -63,6 +63,11 @@ public function login(Request $request)
             
             if($user->role !='admin'){
                 $user->points = $user->points +2;
+                $user->pointHistories()->create([
+                    'title'=>'User Login',
+                    'description'=>'You initiated a new login',
+                    'addition'=>'+2',
+                ]);
             }
              $user->save();
         

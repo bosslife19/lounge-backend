@@ -59,7 +59,9 @@ public function mentors()
                 ->withTimestamps();
 
 }
-
+public function pointHistories(){
+    return $this->hasMany(PointsHistory::class);
+}
 // As a mentor, get my mentees
 public function mentees()
 {
