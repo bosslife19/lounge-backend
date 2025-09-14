@@ -8,7 +8,9 @@ use App\Models\Event;
 use App\Models\MentorListing;
 use App\Models\MentorRequest;
 use App\Models\Organization;
+use App\Models\Program;
 use App\Models\Request as ModelsRequest;
+use App\Models\Section;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
@@ -113,6 +115,62 @@ public function deleteUser(Request $request){
         return response()->json(['status'=>true]);
     }
 
+    public function uploadVideo(Request $request){
+        try {
+            //code...
+             $request->validate(['title'=>'required|string', 'link'=>'required|string']);
+             $user = $request->user();
+           $video =   $user->videos()->create([
+                'thumbnail'=>$request->image,
+                'title'=>$request->title,
+                'video_link'=>$request->link
+             ]);
+             return response()->json(['status'=>true, 'video'=>$video], 201);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(['error'=>$th->getMessage()]);
+        }
+       
+    }
+
+public function createProgram(Request $request){
+    try {
+        $request->validate([
+            'title' => 'required',
+            'content' => 'required'
+        ]);
+
+        $program = Program::create([
+            'title' => $request->title,
+            'content' => $request->content
+        ]);
+
+        $sessions = $request->sessions;
+
+        if ($sessions) {
+
+
+            foreach ($sessions as $session) {
+                $program->sections()->create([
+                    'title'       => $session['title'] ?? 'Title',
+                    'description' => $session['description'] ?? 'Description',
+                    'video_link'  => $session['video'] ?? 'Video',
+                    'time'        => $session['time'] ?? 'Time',
+                    'date'        => $session['date'] ?? 'Date',
+                ]);
+            }
+        }
+
+        return response()->json([
+            'status'  => true,
+            'program' => $program->load('sections')
+        ]);
+    } catch (\Throwable $th) {
+        return response()->json(['error' => $th->getMessage()]);
+    }
+}
+
+
     public function getMentors(Request $request){
         $mentors = MentorRequest::with('user')->where('status', 'approved')->get();
         return response()->json(['mentors'=>$mentors, 'status'=>true]);
@@ -121,6 +179,23 @@ public function deleteUser(Request $request){
         $organizations = Organization::where('status', 'approved')->get();
 
         return response()->json(['status'=>true, 'organizations'=>$organizations]);
+    }
+
+    public function createSpeakerHighlight(Request $request){
+
+try {
+    //code...
+    $request->validate(['name'=>'required', 'highlight'=>'required']);
+    $program = Program::where('id', $request->programId)->first();
+   $newProgram =  $program->speakerHighlights()->create([
+        'speaker_name'=>$request->name,
+        'highlight'=>$request->highlight
+    ]);
+    return response()->json(['status'=>true, 'program'=>$newProgram]);
+} catch (\Throwable $th) {
+    //throw $th;
+    return response()->json(['error'=>$th->getMessage()]);
+}
     }
     public function uploadPost(Request $request){
         try {

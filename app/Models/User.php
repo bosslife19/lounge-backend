@@ -53,6 +53,9 @@ public function mentorRequest(){
 public function mentorListing(){
     return $this->hasOne(MentorListing::class);
 }
+public function videos(){
+    return $this->hasMany(Video::class);
+}
 public function mentors()
 {
     return $this->belongsToMany(\App\Models\User::class, 'mentor_user', 'user_id', 'mentor_id')

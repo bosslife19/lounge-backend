@@ -7,9 +7,10 @@ use App\Http\Controllers\MentorController;
 use App\Http\Controllers\MentorListingController;
 use App\Http\Controllers\OrganizationController;
 use App\Http\Controllers\PostController;
+use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\VerificationController;
-
+use App\Http\Controllers\VideoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -55,10 +56,15 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/request-session', [UserController::class, 'requestSession']);
     // Route::get('/get-organizations', [AdminController::class, 'getOrganizations/']);
     Route::get('/get-all-posts', [PostController::class, 'getAllPosts']);
+    Route::post("/upload-video", [AdminController::class, 'uploadVideo']);
+    Route::get('/get-videos', [VideoController::class, 'getVideos']);
+    Route::post('/program', [AdminController::class, 'createProgram']);
     Route::post('/comment', [CommentController::class,'addComment']);
     Route::get('/users', [UserController::class, 'getAllUsers']);
     Route::post('/change-password', [UserController::class, 'changePassword']);
     Route::get('/posts/{id}', [PostController::class, 'getUserPosts']);
+    Route::get('/programs', [ProgramController::class, 'getPrograms']);
+    Route::post('/speaker-highlights', [AdminController::class, 'createSpeakerHighlight']);
     Route::post('/respond-to-match', [UserController::class, 'respondToMatch']);
     Route::delete('/posts/{id}', [PostController::class, 'deletePost']);
     Route::post('/upload-article', [AdminController::class, 'uploadArticle']);
