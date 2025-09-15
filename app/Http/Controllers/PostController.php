@@ -38,7 +38,12 @@ class PostController extends Controller
     
     public function getArticles(){
         $user = User::where('role', 'admin')->first();
-        $articles = $user->contents()->latest()->get();
+        $articles = $user->contents()->where('type','article')->latest()->get();
+        return response()->json(['articles'=>$articles, 'status'=>true]);
+    }
+    public function getUpdates(){
+         $user = User::where('role', 'admin')->first();
+        $articles = $user->contents()->where('type','news')->latest()->get();
         return response()->json(['articles'=>$articles, 'status'=>true]);
     }
 

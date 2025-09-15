@@ -70,6 +70,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/upload-article', [AdminController::class, 'uploadArticle']);
     Route::get('/points-histories/{id}', [UserController::class, 'getUserPointHistories']);
     Route::get('/get-articles', [PostController::class, 'getArticles']);
+    Route::get('/updates', [PostController::class, 'getUpdates']);
     Route::post('/delete-article', [AdminController::class, 'deleteArticle']);
     Route::post('/update-admin-email', [AdminController::class, 'updateEmail']);
     Route::post('/update-admin-password', [AdminController::class, 'updateAdminPassword']);

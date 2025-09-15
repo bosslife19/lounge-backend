@@ -56,7 +56,8 @@ public function deleteUser(Request $request){
             'title'=>$request->title,
             'link'=>$request->link,
             'image'=>$request->image,
-            'content'=>$request->content
+            'content'=>$request->content,
+            'type'=>$request->type
           ]);
           return response()->json(['status'=>true, 'article'=>$content]);
         } catch (\Throwable $th) {
