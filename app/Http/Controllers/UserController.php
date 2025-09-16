@@ -219,7 +219,10 @@ public function respondToMatch(Request $request){
   
     $user = User::find($request->user()->id);
     $this->respondToMarch($match, $user, $request->response, $request->isMeeting);
-   $delete= (new MentorMatchingService())->deleteNotify($request->notId);
+    if(!$request->stay){
+ $delete= (new MentorMatchingService())->deleteNotify($request->notId);
+    }
+  
    if($user->id != $match->mentor_id && $request->response=='accepted' && !$request->isMeeting){
 (new MentorMatchingService())->sendNotify($match->mentor_id,'Mentorship match accepted', "$user->name has acccepted to be your mentee");
    }
@@ -234,8 +237,10 @@ public function respondToMatch(Request $request){
    }
    
    
-   if($delete){
+   if($delete ||!$request->stay){
 return response()->json(['status'=>true]);
+   }elseif($request->stay){
+    return response()->json(['status'=>true]);
    }
    return response()->json(['error'=>'Server Error']);
     

@@ -13,18 +13,20 @@ class MentorMatchingService
 {
     public function run()
     {
-        $users = User::where('is_mentor', false)->where('opted_in', true)->get();
+        $users = User::where('opted_in', true)->get();
    
         
         foreach ($users as $user) {
             $mentor = User::where('profession', $user->profession)
-                ->where('is_mentor', true)->where('opted_in', true)
+                ->where('opted_in', true)->where('id', '!=', $user->id)
                 
                 ->inRandomOrder()
                 ->first();
                
+               
 
             if ($mentor) {
+        
 
                 MentorMatch::updateOrCreate(
                     ['user_id' => $user->id],
@@ -34,10 +36,11 @@ $match = March::create([
     'user_id'   => $user->id,
     'mentor_id' => $mentor->id,
 ]);
-                // Send notifications to Supabase
-                $this->sendNotification($user->id, 'Call Matching', "You’ve been matched to be in a 15 minute call with {$mentor->first_name} {$mentor->last_name}", $mentor->profile_picture, $mentor->profession,$mentor->first_name, $match->id, true);
 
-                $this->sendNotification($mentor->id, 'Call Matching', "You’ve been matched to be in a 15 minute call with {$user->first_name} {$user->last_name}", $user->profile_picture, $user->profession, $user->first_name, $match->id, true);
+                // Send notifications to Supabase
+                $this->sendNotification($user->id, 'You Have Matched', "You’ve been matched to be in a 15 minute call with {$mentor->first_name} {$mentor->last_name}", $mentor->profile_picture, $mentor->profession,$mentor->first_name, $match->id, true);
+
+                $this->sendNotification($mentor->id, 'You Have Matched', "You’ve been matched to be in a 15 minute call with {$user->first_name} {$user->last_name}", $user->profile_picture, $user->profession, $user->first_name, $match->id, true);
                 try {
                     //code...
                      Mail::to($user->email)->send(new UserMatching('New Weekly Matching', "You have been matched to be in a 15 minute call with $mentor->first_name $mentor->last_name, this is his email $mentor->email", $user->name));
