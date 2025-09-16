@@ -30,7 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile', [UserController::class, 'createProfile']);
     Route::get('/profile', [UserController::class, 'getProfile']);
     Route::put('/profile', [UserController::class, 'updateProfile']);
-    Route::get('/users', [UserController::class, 'listUsers']);
+    // Route::get('/users', [UserController::class, 'listUsers']);
     Route::post('/request-to-mentor', [UserController::class, 'requestToMentor']);
     Route::get('/get-all-mentor-requests', [AdminController::class, 'getAllMentorRequests']);
     Route::get('/organization-requests', [AdminController::class, 'getOrganizationRequests']);
@@ -63,6 +63,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users', [UserController::class, 'getAllUsers']);
     Route::post('/change-password', [UserController::class, 'changePassword']);
     Route::get('/posts/{id}', [PostController::class, 'getUserPosts']);
+    Route::get('/me/{id}', [UserController::class, 'getMe']);
     Route::get('/programs', [ProgramController::class, 'getPrograms']);
     Route::post('/speaker-highlights', [AdminController::class, 'createSpeakerHighlight']);
     Route::post('/respond-to-match', [UserController::class, 'respondToMatch']);

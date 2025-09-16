@@ -114,7 +114,7 @@ public function requestToMentor(Request $request){
     }
 
     public function getAllUsers(Request $request){
-        $users = User::where('id', '!=', $request->user()->id)->where('role', '!=', 'admin')->get();
+        $users = User::where('id', '!=', $request->user()->id)->where('role', '!=', 'admin')->with('organization')->get();
 
         return response()->json(['users'=>$users, 'status'=>true]);
     }
@@ -143,6 +143,12 @@ public function requestToMentor(Request $request){
 public function getEvents(){
     $events = Event::latest()->get();
     return response()->json(['events'=>$events, 'status'=>true], 200);
+}
+public function getMe($id){
+    $user = User::where('id', $id)->with('organization')->first();
+
+    return response()->json(['status'=>true, 'user'=>$user]);
+
 }
 public function respondToMarch(March $match, User $actor, string $response, $isMeeting)
 {
@@ -220,7 +226,7 @@ public function respondToMatch(Request $request){
     $user = User::find($request->user()->id);
     $this->respondToMarch($match, $user, $request->response, $request->isMeeting);
     if(!$request->stay){
- $delete= (new MentorMatchingService())->deleteNotify($request->notId);
+ (new MentorMatchingService())->deleteNotify($request->notId);
     }
   
    if($user->id != $match->mentor_id && $request->response=='accepted' && !$request->isMeeting){
@@ -237,12 +243,8 @@ public function respondToMatch(Request $request){
    }
    
    
-   if($delete ||!$request->stay){
-return response()->json(['status'=>true]);
-   }elseif($request->stay){
-    return response()->json(['status'=>true]);
-   }
-   return response()->json(['error'=>'Server Error']);
+   
+   return response()->json(['status'=>true]);
     
 }
 public function getMyMentors(Request $request){
