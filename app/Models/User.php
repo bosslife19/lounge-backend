@@ -41,6 +41,9 @@ public function organization()
 {
     return $this->belongsTo(Organization::class);
 }
+public function likes(){
+    return $this->hasMany(Like::class);
+}
 
 
 public function contents(){

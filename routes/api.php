@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\LikeController;
 use App\Http\Controllers\MentorController;
 use App\Http\Controllers\MentorListingController;
 use App\Http\Controllers\OrganizationController;
@@ -59,6 +60,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post("/upload-video", [AdminController::class, 'uploadVideo']);
     Route::get('/get-videos', [VideoController::class, 'getVideos']);
     Route::post('/program', [AdminController::class, 'createProgram']);
+    Route::post('/like-post', [LikeController::class, 'likePost']);
     Route::post('/comment', [CommentController::class,'addComment']);
     Route::get('/users', [UserController::class, 'getAllUsers']);
     Route::post('/change-password', [UserController::class, 'changePassword']);

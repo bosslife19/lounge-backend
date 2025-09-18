@@ -152,9 +152,17 @@ public function getMe($id){
 }
 public function respondToMarch(March $match, User $actor, string $response, $isMeeting)
 {
+  
     if ($actor->id === $match->user_id) {
+        if($match->user_status =='accepted'||$match->user_status=='rejected'){
+            
+            return 'responded';
+        }
         $match->user_status = $response; // 'accepted' or 'rejected'
     } elseif ($actor->id === $match->mentor_id) {
+         if($match->mentor_status =='accepted'||$match->mentor_status=='rejected'){
+            return 'responded';
+        }
         $match->mentor_status = $response;
     } else {
         abort(403, 'Not part of this match.');
@@ -224,7 +232,10 @@ public function respondToMatch(Request $request){
     $match = March::find($request->marchId);
   
     $user = User::find($request->user()->id);
-    $this->respondToMarch($match, $user, $request->response, $request->isMeeting);
+   $respond = $this->respondToMarch($match, $user, $request->response, $request->isMeeting);
+   if($respond =='responded'){
+    return response()->json(['error'=>'You have already responded to this match']);
+   }
     if(!$request->stay){
  (new MentorMatchingService())->deleteNotify($request->notId);
     }

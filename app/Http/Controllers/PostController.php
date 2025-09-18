@@ -51,6 +51,7 @@ class PostController extends Controller
 {
     $posts = \App\Models\Post::with([
         'user',
+        'likes',
         'comments' => function ($query) {
             $query->latest(); // orders comments by created_at descending
         }
