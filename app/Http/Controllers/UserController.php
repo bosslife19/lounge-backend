@@ -24,6 +24,7 @@ class UserController extends Controller
         try {
             //code...
             $user->first_name = $request->firstName;
+            $user->name = "$request->firstName $request->lastName";
         $user->last_name = $request->lastName;
         $user->city = $request->location;
         $user->profession = $request->profession;
@@ -86,6 +87,80 @@ class UserController extends Controller
         }
 
         
+    }
+  public function editProfile(Request $request)
+    {
+        $user = $request->user();
+      
+
+        // Update fields only if they exist in the request
+        if ($request->firstName) {
+            $user->first_name = $request->firstName;
+            $user->name = $request->firstName . ' ' . ($request->lastName ?? $user->last_name);
+        }
+
+        if ($request->lastName) {
+            $user->last_name = $request->lastName;
+        }
+
+        if ($request->location) {
+            $user->city = $request->location;
+        }
+
+        if ($request->profession) {
+            $user->profession = $request->profession;
+        }
+
+        if ($request->bio) {
+            $user->bio = $request->bio;
+        }
+
+        if ($request->linkedin) {
+            $user->linkedin_url = $request->linkedin;
+        }
+
+        if ($request->facebook) {
+            $user->facebook_url = $request->facebook;
+        }
+
+        if ($request->experience) {
+            $user->years_of_experience = $request->experience;
+        }
+
+        if ($request->pronouns) {
+            $user->pronouns = $request->pronouns;
+        }
+
+        if ($request->phone) {
+            $user->phone = $request->phone;
+        }
+
+        if ($request->category) {
+            $user->category = $request->category;
+        }
+
+        if ($request->roots) {
+            $user->roots = $request->roots;
+        }
+
+        if ($request->profilePic) {
+            $user->profile_picture = $request->profilePic;
+        }
+
+      
+        if ($request->organization) {
+            
+            $organization = Organization::where('name', $request->organization)->first();
+            $user->organization_id = $organization ? $organization->id : null;
+
+        }
+
+        $user->save();
+
+        return response()->json([
+            'status' => true,
+            'user' => $user->with('organization')->first()
+        ]);
     }
 public function requestToMentor(Request $request){
     $user = $request->user();

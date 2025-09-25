@@ -8,6 +8,9 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
+use Google_Client;
+use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
@@ -16,13 +19,13 @@ class AuthController extends Controller
         try {
             //code...
                     $request->validate([
-            'name' => 'required|string|max:255',
+            
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string',
         ]);
 
         $user = User::create([
-            'name' => $request->name,
+            
             'email' => $request->email,
             'password' => bcrypt($request->password),
         ]);
@@ -146,7 +149,60 @@ public function resendEmailOtp(Request $request)
         // Save the code in the database associated with the user
         // This part should be implemented based on your database structure
     }
+   public function registerViaGoogle(Request $request)
+    {
 
+        $request->validate([
+            'token' => 'required|string',
+        ]);
+
+        $client = new Google_Client([
+            'client_id' => config('services.google.client_id'),
+        ]);
+
+        $payload = $client->verifyIdToken($request->token);
+
+
+        if (!$payload) {
+            return response()->json([
+                'error' => 'Invalid Google ID token'
+            ], 401);
+        }
+
+        $googleId = $payload['sub'];
+        $email    = $payload['email'] ?? null;
+        $name     = $payload['name'] ?? null;
+        
+
+        if (!$email) {
+            return response()->json([
+                'error' => 'No email associated with Google account'
+            ], 422);
+        }
+
+        // Find or create user
+        $user = User::firstOrCreate(
+            ['google_id' => $googleId],
+            [
+                'google_id'=>$googleId,
+                'email' => $email,
+                'name'  => $name,
+                // If your users table requires password, generate random or nullable
+                'password' => Hash::make("1234"),
+                'profile_picture'=>$payload['picture'],
+                'email_verified_at'=>now()
+            ]
+        );
+
+        // If you use Sanctum and the User model uses HasApiTokens
+        $token = $user->createToken('google_auth_token')->plainTextToken;
+
+        return response()->json([
+            'user'  => $user,
+            'token' => $token,
+            'status'=>true,
+        ]);
+    }
     public function checkEmailExists(Request $request)
     {
         try {

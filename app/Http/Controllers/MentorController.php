@@ -49,19 +49,36 @@ class MentorController extends Controller
             // if($exists){
             //     return response()->json(['error'=>'You cannot create more than one listing']);
             // }
-            $mentorListing = MentorListing::where('id', $request->listingId)->first();
-            $mentorListing->update([
-                'title'=>$request->title,
-                'access_email'=>$request->accessEmail,
-                'description'=>$request->description,
-                'price'=>$request->price,
-                'is_free'=>$request->isFree,
-                'calendly'=>$request->calendly,
-                'preparation_notice'=>$request->preparatoryNote,
-                
+$mentorListing = MentorListing::findOrFail($request->listingId);
 
-            ]);
-            return response()->json(['status'=>true]);
+$data = array_filter($request->only([
+    'title',
+    'accessEmail',
+    'description',
+    'price',
+    'isFree',
+    'calendly',
+    'preparatoryNote',
+]), function ($value) {
+    return !is_null($value) && $value !== '';
+});
+
+// Map request keys to DB column names
+$mappedData = [
+    'title' => $data['title'] ?? $mentorListing->title,
+    'access_email' => $data['accessEmail'] ?? $mentorListing->access_email,
+    'description' => $data['description'] ?? $mentorListing->description,
+    'price' => $data['price'] ?? $mentorListing->price,
+    'is_free' => $data['isFree'] ?? $mentorListing->is_free,
+    'calendly' => $data['calendly'] ?? $mentorListing->calendly,
+    'preparation_notice' => $data['preparatoryNote'] ?? $mentorListing->preparation_notice,
+];
+
+$mentorListing->update($mappedData);
+
+$user = $request->user();
+return response()->json(['status' => true, 'listings'=> $user->mentorListing()->with('user')->get()]);
+
         } catch (\Throwable $th) {
             //throw $th;
             return response()->json(['error'=>$th->getMessage()]);

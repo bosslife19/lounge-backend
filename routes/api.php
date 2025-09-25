@@ -26,6 +26,8 @@ Route::post('/resend-email-otp', [AuthController::class, 'resendEmailOtp']);
 Route::post('/check-email-exists', [AuthController::class, 'checkEmailExists']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
 
+    Route::post('/google',[AuthController::class, 'registerViaGoogle']);
+
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::post('/profile', [UserController::class, 'createProfile']);
@@ -40,6 +42,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/approve-organization-request', [AdminController::class, 'approveOrganizationRequest']);
     Route::post('/profile/upload', [UserController::class, 'uploadProfilePicture']);
     Route::get('/get-organizations', [OrganizationController::class, 'getOrganizations']);
+    Route::post("/edit-profile", [UserController::class, 'editProfile']);
     Route::post('/upload-post', [PostController::class, 'uploadPost']);
     Route::post('/upload-post-admin', [AdminController::class, 'uploadPost']);
     Route::get('/get-admin-posts', [AdminController::class, 'getPosts']);
@@ -65,6 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users', [UserController::class, 'getAllUsers']);
     Route::post('/change-password', [UserController::class, 'changePassword']);
     Route::get('/posts/{id}', [PostController::class, 'getUserPosts']);
+
     Route::get('/me/{id}', [UserController::class, 'getMe']);
     Route::get('/programs', [ProgramController::class, 'getPrograms']);
     Route::post('/speaker-highlights', [AdminController::class, 'createSpeakerHighlight']);
