@@ -26,7 +26,7 @@ class PostController extends Controller
                 $user->save();
             }
 
-            return response()->json(['status'=>true, 'message'=>'Post uploaded successfully', 'post'=>$post]);
+            return response()->json(['status'=>true, 'message'=>'Post uploaded successfully', 'post'=>$post->with('user')->where('user_id',$user->id)->latest()->first()]);
         } catch (\Throwable $th) {
             //throw $th;
             return response()->json(['message'=>$th->getMessage()]);
