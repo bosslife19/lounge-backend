@@ -72,6 +72,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('/me/{id}', [UserController::class, 'getMe']);
     Route::get('/programs', [ProgramController::class, 'getPrograms']);
+    Route::get('/programs/{id}', [ProgramController::class, 'getProgram']);
     Route::post('/speaker-highlights', [AdminController::class, 'createSpeakerHighlight']);
     Route::post('/respond-to-match', [UserController::class, 'respondToMatch']);
     Route::delete('/posts/{id}', [PostController::class, 'deletePost']);
