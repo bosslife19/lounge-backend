@@ -20,4 +20,8 @@ class LikeController extends Controller
         return response()->json(['status'=>true]);
 
     }
+    public function getLikes(Request $request){
+        $likes = Like::with('user', 'post')->latest()->get();
+        return response()->json(['status'=>true, 'likes'=>$likes]);
+    }
 }

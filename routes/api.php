@@ -49,6 +49,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/delete-user', [AdminController::class, 'deleteUser']);
     Route::get('/get-my-listings', [MentorListingController::class, 'getMyListings']);
     Route::get('/get-mentors', [AdminController::class, 'getMentors']);
+    Route::get('/likes', [LikeController::class, 'getLikes']);
     Route::get('/get-events', [UserController::class, 'getEvents']);
     Route::post('/create-listing', [MentorController::class, 'createListing']);
     Route::post('/edit-listing', [MentorController::class, 'editListing']);
