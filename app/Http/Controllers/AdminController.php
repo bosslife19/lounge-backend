@@ -12,6 +12,7 @@ use App\Models\Program;
 use App\Models\Request as ModelsRequest;
 use App\Models\Section;
 use App\Models\User;
+use App\Models\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -114,6 +115,22 @@ public function deleteUser(Request $request){
         (new MentorMatchingService())->sendNotify($orgRequest->user->id,'Organization Request Accepted', 'Your request to create an organization has been accepted after review');
 
         return response()->json(['status'=>true]);
+    }
+
+    public function updateVideo(Request $request){
+        try {
+            //code...
+            $video = Video::find($request->videoId);
+            $video->update([
+                 'thumbnail'=>$request->image?? $video->thumbnail,
+                'title'=>$request->title,
+                'video_link'=>$request->link
+            ]);
+            return response()->json(['status'=>true]);
+        } catch (\Throwable $th) {
+            //throw $th;
+             return response()->json(['error'=>$th->getMessage()]);
+        }
     }
 
     public function uploadVideo(Request $request){

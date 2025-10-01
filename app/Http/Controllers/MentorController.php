@@ -20,7 +20,7 @@ class MentorController extends Controller
             if($exists){
                 return response()->json(['error'=>'You cannot create more than one listing']);
             }
-            $user->mentorListing()->create([
+           $listing =  $user->mentorListing()->create([
                 'title'=>$request->title,
                 'access_email'=>$request->accessEmail,
                 'description'=>$request->description,
@@ -31,7 +31,7 @@ class MentorController extends Controller
                 'category'=>$request->category,
 
             ]);
-            return response()->json(['status'=>true]);
+            return response()->json(['status'=>true, 'listing'=>$listing->where('mentor_id', $user->id)->with("")]);
         } catch (\Throwable $th) {
             //throw $th;
             return response()->json(['error'=>$th->getMessage()]);

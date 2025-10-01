@@ -62,6 +62,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Route::get('/get-organizations', [AdminController::class, 'getOrganizations/']);
     Route::get('/get-all-posts', [PostController::class, 'getAllPosts']);
     Route::post("/upload-video", [AdminController::class, 'uploadVideo']);
+    Route::post("/update-video", [AdminController::class, 'updateVideo']);
     Route::get('/get-videos', [VideoController::class, 'getVideos']);
     Route::post('/program', [AdminController::class, 'createProgram']);
     Route::post('/like-post', [LikeController::class, 'likePost']);
