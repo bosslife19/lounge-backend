@@ -11,6 +11,7 @@ use App\Models\Organization;
 use App\Models\Program;
 use App\Models\Request as ModelsRequest;
 use App\Models\Section;
+use App\Models\SpeakerHighlight;
 use App\Models\User;
 use App\Models\Video;
 use Illuminate\Http\Request;
@@ -66,6 +67,28 @@ public function deleteUser(Request $request){
             return response()->json(['error'=>$th->getMessage()]);
         }
     }
+        public function updateArticle(Request $request){
+        try {
+           
+           
+            $request->validate(['title'=>'required', 'content'=>'required']);
+          $article = Content::find($request->articleId);
+          $article->update([
+            'title'=>$request->title,
+            'link'=>$request->link,
+            'image'=>$request->image,
+            'content'=>$request->content,
+            'type'=>$request->type
+          ]);
+        
+          return response()->json(['status'=>true, 'article'=>$article]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(['error'=>$th->getMessage()]);
+        }
+    }
+
+   
 
     public function getAllMentorRequests(){
         $requests = MentorRequest::with("user")->where('status', 'pending')->get();
@@ -198,7 +221,28 @@ public function createProgram(Request $request){
 
         return response()->json(['status'=>true, 'organizations'=>$organizations]);
     }
-
+public function deleteArticl($id){
+    $article = Content::find($id);
+    if(!$article){
+        return response()->json(['error'=>'Article not found'], 404);
+    }
+    $article->delete();
+    return response()->json(['status'=>true]);
+}
+public function updateHighlight(Request $request){
+    try {
+        //code...
+        $request->validate(['speaker'=>'required', 'highlight'=>'required']);
+        $highlight =  SpeakerHighlight::where('id', $request->highlightId)->first();
+       $highlight->speaker_name = $request->speaker;
+       $highlight->highlight = $request->highlight;
+       $highlight->save();
+        return response()->json(['status'=>true]);
+    } catch (\Throwable $th) {
+        //throw $th;
+        return response()->json(['error'=>$th->getMessage()]);
+    }
+}
     public function createSpeakerHighlight(Request $request){
 
 try {
@@ -241,6 +285,13 @@ try {
     public function deleteArticle(Request $request){
         $article = Content::find($request->articleId);
         $article->delete();
+        return response()->json(['status'=>true]);
+    }
+    public function updateTitle(Request $request){
+        $program = Program::find($request->programId);
+        $program->title = $request->title;
+        $program->content = $request->description;
+        $program->save();
         return response()->json(['status'=>true]);
     }
     public function updateEmail(Request $request){
@@ -291,6 +342,17 @@ try {
             \Log::info($th->getMessage());
             return response()->json(['error'=>$th->getMessage()]);
         }
+    }
+
+    public function updateSession(Request $request){
+     $session =    Section::where('id', $request->sessionId)->update([
+            'title'=>$request->title,
+            'description'=>$request->description,
+            'video_link'=>$request->link,
+            'time'=>$request->time,
+            'date'=>$request->date,
+        ]);
+        return response()->json(['status'=>true, 'session'=>$session]);
     }
         public function editEvent(Request $request){
         try {
