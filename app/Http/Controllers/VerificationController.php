@@ -39,7 +39,7 @@ class VerificationController extends Controller
 
             
 
-            return response()->json(['message' => 'Email verified successfully.', 'status'=>true], 200);
+            return response()->json(['message' => 'Email verified successfully.', 'status'=>true, 'user'=>$user], 200);
         }
 
         return response()->json(['error' => 'User not found.']);

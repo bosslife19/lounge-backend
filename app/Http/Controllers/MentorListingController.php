@@ -9,13 +9,17 @@ class MentorListingController extends Controller
 {
     public function getMyListings( Request $request){
         $user = $request->user();
-        $listings = $user->mentorListing()->with('user')->get();
+        $listings = $user->mentorListing()->whereHas('user', function ($query) {
+    $query->where('is_mentor', true);
+})->with('user')->get();
         return response()->json(['status'=>true, 'listings'=>$listings]);
 
     }
 
     public function getAllListings(){
-        $listings = MentorListing::with('user')->get();
+       $listings = MentorListing::whereHas('user', function ($query) {
+    $query->where('is_mentor', true);
+})->with('user')->get();
         return response()->json(['status'=>true, 'listings'=>$listings]);
     }
 }

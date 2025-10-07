@@ -38,9 +38,17 @@ $match = March::create([
 ]);
 
                 // Send notifications to Supabase
-                $this->sendNotification($user->id, 'You Have Matched', "You’ve been matched to be in a 15 minute call with {$mentor->first_name} {$mentor->last_name}", $mentor->profile_picture, $mentor->profession,$mentor->first_name, $match->id, true);
+                try {
+                    //code...
+                                    $this->sendNotification($user->id, 'You Have Matched', "You’ve been matched to be in a 15 minute call with {$mentor->first_name} {$mentor->last_name}", $mentor->profile_picture, $mentor->profession,$mentor->first_name, $match->id, true);
 
                 $this->sendNotification($mentor->id, 'You Have Matched', "You’ve been matched to be in a 15 minute call with {$user->first_name} {$user->last_name}", $user->profile_picture, $user->profession, $user->first_name, $match->id, true);
+                } catch (\Throwable $th) {
+                    //throw $th;
+                    \Log::info($th->getMessage());
+                    return;
+                }
+
                 try {
                     //code...
                      Mail::to($user->email)->send(new UserMatching('New Weekly Matching', "You have been matched to be in a 15 minute call with $mentor->first_name $mentor->last_name, this is his email $mentor->email", $user->name));
@@ -74,8 +82,12 @@ $match = March::create([
     {
         $supabaseUrl = env('SUPABASE_URL');
         $supabaseKey = env('SUPABASE_KEY');
-
-        Http::withHeaders([
+        try {
+            //code...
+            
+            // \Log::info($userId, $title, $message, $profile_picture, $profession,$first_name, $match_id, $is_meeting);
+            \Log::info($supabaseUrl, $supabaseKey);
+              Http::withHeaders([
             'apikey' => $supabaseKey,
             'Authorization' => "Bearer {$supabaseKey}",
             'Content-Type' => 'application/json',
@@ -92,6 +104,12 @@ $match = March::create([
 
             
         ]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            \Log::info($th->getMessage());
+        }
+
+      
     }
         public function sendNotify($userId, $title, $message)
     {

@@ -13,9 +13,9 @@ class MentorController extends Controller
         try {
             $request->validate(['accessEmail'=>'required', 'description'=>'required', 'calendly'=>'required', 'title'=>'required', 'category'=>'required']);
             $user = $request->user();
-            if(!$user->is_mentor){
-                return response()->json(['error'=>'Only users approved as mentors can create listings']);
-            }
+            // if(!$user->is_mentor){
+            //     return response()->json(['error'=>'Only users approved as mentors can create listings']);
+            // }
             $exists = MentorListing::where('user_id', $user->id)->first();
             if($exists){
                 return response()->json(['error'=>'You cannot create more than one listing']);
