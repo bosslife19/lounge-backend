@@ -162,6 +162,10 @@ class UserController extends Controller
             'user' => $user->with('organization')->first()
         ]);
     }
+    public function getLinks(Request $request){
+    $links = \App\Models\Link::latest()->get();
+    return response()->json(['status'=>true, 'links'=>$links]);
+}
 public function requestToMentor(Request $request){
     $user = $request->user();
     $exists = MentorRequest::where('user_id', $user->id)->first();

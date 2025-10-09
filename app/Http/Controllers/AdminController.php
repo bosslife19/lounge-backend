@@ -22,6 +22,7 @@ class AdminController extends Controller
      public function __construct()
     {
         $this->middleware(function ($request, $next) {
+
             if ($request->user()->role=='admin') {
                 return $next($request);
             }
@@ -174,6 +175,36 @@ public function deleteUser(Request $request){
        
     }
 
+    public function createOrganization(Request $request){
+        try {
+            //code...
+            $request->validate(['name'=>'required', 'email'=>'required', 'description'=>'required', 'logo'=>'required']);
+            $existingOrg = Organization::where('email', $request->email)->first();
+            if($existingOrg){
+                return response()->json(['error'=>'An organization with this email already exists.'], 400);
+            }
+            $user = $request->user();
+               
+           $organization =  Organization::create([
+                'name'=>$request->name,
+                'email'=>$request->email,
+                'description'=>$request->description,
+                'logo'=>$request->logo,
+                'website_url'=>$request->website,
+                'location'=>$request->location,
+                'status'=>'approved',
+                
+            ]);
+
+          
+
+            return response()->json(['status'=>true, 'organization'=>$organization, 'message'=>'Organization creation request submitted successfully. It will be reviewed by an admin.'], 201);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(['error'=>$th->getMessage()], 500);
+        }
+    }
+
 public function createProgram(Request $request){
     try {
         $request->validate([
@@ -243,6 +274,21 @@ public function updateHighlight(Request $request){
         return response()->json(['error'=>$th->getMessage()]);
     }
 }
+
+public function createLink(Request $request){
+    try {
+        //code...
+        $request->validate(['url'=>'required|url']);
+       $link =  \App\Models\Link::create([
+            'url'=>$request->url
+        ]);
+        return response()->json(['status'=>true, 'link'=>$link]);
+    } catch (\Throwable $th) {
+        //throw $th;
+        return response()->json(['error'=>$th->getMessage()]);
+    }
+}
+
     public function createSpeakerHighlight(Request $request){
 
 try {
@@ -339,7 +385,7 @@ try {
 
         } catch (\Throwable $th) {
             //throw $th;
-            \Log::info($th->getMessage());
+
             return response()->json(['error'=>$th->getMessage()]);
         }
     }

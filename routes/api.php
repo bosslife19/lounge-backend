@@ -22,6 +22,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/send-verification-code', [AuthController::class, 'sendVerificationCode']);
 Route::post('/verify-email', [VerificationController::class, 'verifyEmail']);
+
 Route::post('/resend-email-otp', [AuthController::class, 'resendEmailOtp']);
 Route::post('/check-email-exists', [AuthController::class, 'checkEmailExists']);
 Route::post('/reset-password', [AuthController::class, 'resetPassword']);
@@ -45,11 +46,16 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post("/edit-profile", [UserController::class, 'editProfile']);
     Route::post('/upload-post', [PostController::class, 'uploadPost']);
     Route::post('/upload-post-admin', [AdminController::class, 'uploadPost']);
+    Route::post('/link', [AdminController::class, 'createLink']);
+    Route::get('/links', [UserController::class, 'getLinks']);
     Route::get('/get-admin-posts', [AdminController::class, 'getPosts']);
     Route::post('/delete-user', [AdminController::class, 'deleteUser']);
     Route::get('/get-my-listings', [MentorListingController::class, 'getMyListings']);
+    Route::post('/organization', [AdminController::class, 'createOrganization']);
     Route::get('/get-mentors', [AdminController::class, 'getMentors']);
     Route::get('/likes', [LikeController::class, 'getLikes']);
+
+
     Route::get('/get-events', [UserController::class, 'getEvents']);
     Route::post('/create-listing', [MentorController::class, 'createListing']);
     Route::post('/edit-listing', [MentorController::class, 'editListing']);
