@@ -193,7 +193,7 @@ public function requestToMentor(Request $request){
     }
 
     public function getAllUsers(Request $request){
-        $users = User::where('id', '!=', $request->user()->id)->where('role', '!=', 'admin')->with('organization')->get();
+        $users = User::where('id', '!=', $request->user()->id)->where('role', '!=', 'admin')->where('profile_status', 'complete')->with('organization')->get();
 
         return response()->json(['users'=>$users, 'status'=>true]);
     }
