@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Services\MentorMatchingService;
 use App\Mail\UserMatching;
+use App\Models\BenfitRequest;
 use App\Models\Event;
 use App\Models\March;
 use App\Models\MentorMatch;
@@ -81,12 +82,51 @@ class UserController extends Controller
         } catch (\Throwable $th) {
             //throw $th;
             // \Log::info($th->getMessage());
+            \Log::info($th->getMessage());
 
             return response()->json(['message'=>$th->getMessage()]);
 
         }
 
         
+    }
+    public function claimBenefit(Request $request){
+        $user = $request->user();
+        $userPoints = $user->points;
+        if($userPoints < $request->points){
+            return response()->json(['error'=>'You do not have enough points to claim this benefit']);
+        }
+        $user->points = $user->points - $request->points;
+        // $user->pointHistories()->create([
+        //     'title'=>'Benefit Claimed',
+        //     'description'=>"You claimed the benefit: ".$request->benefit,
+        //     'addition'=>'-'.$request->points,
+        // ]);
+        $user->save();
+
+        BenfitRequest::create([
+            'name'=>$user->name,
+            'profession'=>$user->profession,
+            'benefit'=>$request->benefit,
+            'points'=>$user->points,
+        ]);
+
+        return response()->json(['status'=>true, 'message'=>'Benefit Request Successful. Our team will reach out to you shortly.']);
+    }
+    public function checkMentorRequested(Request $request){
+        $user = $request->user();
+        $exists = MentorRequest::where('user_id', $user->id)->first();
+        if($exists){
+            return response()->json(['status'=>true, 'requested'=>true]);
+        }
+        return response()->json(['status'=>true, 'requested'=>false]);
+    }
+    public function checkOptedInCoffeeRoulette(Request $request){
+        $user = $request->user();
+        if($user->opted_in){
+            return response()->json(['status'=>true, 'optedIn'=>true]);
+        }
+        return response()->json(['status'=>true, 'optedIn'=>false]);
     }
   public function editProfile(Request $request)
     {
@@ -193,7 +233,7 @@ public function requestToMentor(Request $request){
     }
 
     public function getAllUsers(Request $request){
-        $users = User::where('id', '!=', $request->user()->id)->where('role', '!=', 'admin')->where('profile_status', 'complete')->with('organization')->get();
+        $users = User::where('role', '!=', 'admin')->where('profile_status', 'complete')->with('organization')->get();
 
         return response()->json(['users'=>$users, 'status'=>true]);
     }

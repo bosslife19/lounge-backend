@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\MentorListing;
+use App\Models\SessionRequest;
 use Illuminate\Http\Request;
 
 class MentorController extends Controller
@@ -32,6 +33,17 @@ class MentorController extends Controller
 
             ]);
             return response()->json(['status'=>true, 'listing'=>$listing->where('mentor_id', $user->id)->with("")]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(['error'=>$th->getMessage()]);
+        }
+      }
+
+      public function getRequestedSessions(Request $request){
+        try {
+            $user = $request->user();
+            $sessions = SessionRequest::where('user_id', $user->id)->get();
+            return response()->json(['status'=>true, 'sessions'=>$sessions]);
         } catch (\Throwable $th) {
             //throw $th;
             return response()->json(['error'=>$th->getMessage()]);

@@ -17,11 +17,11 @@ class PostController extends Controller
                 'post_image'=>$request->image,
             ]);
              if($user->role !='admin'){
-                $user->points = $user->points +2;
+                $user->points = $user->points +5;
                 $user->pointHistories()->create([
                     'title'=>'Post Creation',
                     'description'=>'You created a post',
-                    'addition'=>'+2',
+                    'addition'=>'+5',
                 ]);
                 $user->save();
             }

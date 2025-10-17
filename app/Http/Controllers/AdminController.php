@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Services\MentorMatchingService;
+use App\Models\BenfitRequest;
 use App\Models\Content;
 use App\Models\Event;
 use App\Models\MentorListing;
@@ -89,6 +90,25 @@ public function deleteUser(Request $request){
         }
     }
 
+    public function approveReward(Request $request){
+        $benefitReq = BenfitRequest::find($request->id);
+         $user = User::where('name', $benefitReq->name)->first();
+        $benefitReq->delete();
+       
+        $notify = (new MentorMatchingService())->sendNotify($user->id, 'Benefit Approved', 'Your Benefit Request has been approved');
+        return response()->json(['status'=>true]);
+
+    }
+
+    public function declineReward(Request $request){
+         $benefitReq = BenfitRequest::find($request->id);
+         $user = User::where('name', $benefitReq->name)->first();
+        $benefitReq->delete();
+       
+        $notify = (new MentorMatchingService())->sendNotify($user->id, 'Benefit Declined', 'Your Benefit Request has been declined');
+        return response()->json(['status'=>true]);
+
+    }
    
 
     public function getAllMentorRequests(){
@@ -259,6 +279,10 @@ public function deleteArticl($id){
     }
     $article->delete();
     return response()->json(['status'=>true]);
+}
+public function getBenefitRequests(Request $request){
+    $requests = \App\Models\BenfitRequest::all();
+    return response()->json(['status'=>true, 'requests'=>$requests]);
 }
 public function updateHighlight(Request $request){
     try {

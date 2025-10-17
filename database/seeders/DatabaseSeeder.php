@@ -23,6 +23,6 @@ class DatabaseSeeder extends Seeder
             "profile_picture" => 'https://ui-avatars.com/api/?name=Admin&background=random&size=128',
 
         ]);
-        User::factory()->count(1)->create();
+
     }
 }

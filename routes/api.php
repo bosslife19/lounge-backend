@@ -67,7 +67,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/request-session', [UserController::class, 'requestSession']);
     // Route::get('/get-organizations', [AdminController::class, 'getOrganizations/']);
     Route::get('/get-all-posts', [PostController::class, 'getAllPosts']);
+    Route::get('/get-requested-sessions', [MentorController::class, 'getRequestedSessions']);
     Route::post("/upload-video", [AdminController::class, 'uploadVideo']);
+    Route::get('/check-mentor-requested', [UserController::class, 'checkMentorRequested']);
+    Route::get('/check-opted-in-coffee-roulette', [UserController::class, 'checkOptedInCoffeeRoulette']);
     Route::post("/update-video", [AdminController::class, 'updateVideo']);
     Route::get('/get-videos', [VideoController::class, 'getVideos']);
     Route::post('/program', [AdminController::class, 'createProgram']);
@@ -76,6 +79,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/users', [UserController::class, 'getAllUsers']);
     Route::post('/change-password', [UserController::class, 'changePassword']);
     Route::get('/posts/{id}', [PostController::class, 'getUserPosts']);
+    Route::post('/claim-benefit', [UserController::class, 'claimBenefit']);
+    Route::get('/reward-requests', [AdminController::class, 'getBenefitRequests']);
+    Route::post('/approve-reward', [AdminController::class, 'approveReward']);
+    Route::post('/decline-reward', [AdminController::class, 'declineReward']);
 
     Route::get('/me/{id}', [UserController::class, 'getMe']);
     Route::get('/programs', [ProgramController::class, 'getPrograms']);

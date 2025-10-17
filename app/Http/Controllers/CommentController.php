@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Services\MentorMatchingService;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
@@ -14,6 +15,7 @@ class CommentController extends Controller
             ]);
 
             $user = $request->user();
+            $post = \App\Models\Post::where('id', $request->post_id)->first();
 
             $user->comments()->create([
                 'post_id'=>$request->post_id,
@@ -30,6 +32,7 @@ class CommentController extends Controller
                 ]);
                 $user->save();
             }
+            (new MentorMatchingService())->sendNotify($post->user_id, "Your post has a new comment.", "$user->first_name commented on your Post");
 
             return response()->json(['status'=>true, 'message'=>'Comment added successfully']);
         }catch (\Throwable $th) {
