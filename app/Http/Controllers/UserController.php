@@ -51,6 +51,7 @@ class UserController extends Controller
                 'email'=>$request->organizationEmail,
                 'website_url'=>$request->organizationWebsite,
                 'location'=>$request->organizationLocation,
+                'creator_id'=>$user->id,
                 'status'=>'pending',
           ]);
 
@@ -206,6 +207,51 @@ class UserController extends Controller
     $links = \App\Models\Link::latest()->get();
     return response()->json(['status'=>true, 'links'=>$links]);
 }
+
+public function editOrganization(Request $request)
+{
+    $user = $request->user();
+    $organization = Organization::where('id', $request->id)->first();
+
+
+  
+
+    // Update fields only if they exist in the request
+    if ($request->name) {
+        $organization->name = $request->name;
+    }
+
+    if ($request->email) {
+        $organization->email = $request->email;
+    }
+
+    if ($request->website) {
+        $organization->website_url = $request->website;
+    }
+
+    if ($request->logo) {
+        $organization->logo = $request->logo;
+    }
+
+    if ($request->location) {
+        $organization->location = $request->location;
+    }
+
+    if ($request->description) {
+        $organization->description = $request->description;
+    }
+
+   
+
+    $organization->save();
+
+    return response()->json([
+        'status' => true,
+        'user' => $user->with('organization')->first()
+    ]);
+}
+
+
 public function requestToMentor(Request $request){
     $user = $request->user();
     $exists = MentorRequest::where('user_id', $user->id)->first();

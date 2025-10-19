@@ -321,7 +321,8 @@ try {
     $program = Program::where('id', $request->programId)->first();
    $newProgram =  $program->speakerHighlights()->create([
         'speaker_name'=>$request->name,
-        'highlight'=>$request->highlight
+        'highlight'=>$request->highlight,
+        'speaker_image'=>$request->speakerImage
     ]);
     return response()->json(['status'=>true, 'program'=>$newProgram]);
 } catch (\Throwable $th) {

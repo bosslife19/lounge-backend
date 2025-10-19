@@ -44,6 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/profile/upload', [UserController::class, 'uploadProfilePicture']);
     Route::get('/get-organizations', [OrganizationController::class, 'getOrganizations']);
     Route::post("/edit-profile", [UserController::class, 'editProfile']);
+    Route::post('/edit-organization', [UserController::class, 'editOrganization']);
     Route::post('/upload-post', [PostController::class, 'uploadPost']);
     Route::post('/upload-post-admin', [AdminController::class, 'uploadPost']);
     Route::post('/link', [AdminController::class, 'createLink']);
