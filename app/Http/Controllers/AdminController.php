@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Services\MentorMatchingService;
+use App\Models\Benefit;
 use App\Models\BenfitRequest;
 use App\Models\Content;
 use App\Models\Event;
@@ -195,6 +196,44 @@ public function deleteUser(Request $request){
        
     }
 
+    public function createBenefit(Request $request){
+        try {
+            //code...
+            $request->validate(['title'=>'required', 'points'=>'required', 'company'=>'required']);
+            $benefit = Benefit::create([
+                'title'=>$request->title,
+                'points_required'=>$request->points,
+                'company'=>$request->company
+            ]);
+            return response()->json(['status'=>true, 'benefit'=>$benefit]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(['error'=>$th->getMessage()]);
+        }
+        
+    }
+        public function editBenefit(Request $request){
+        try {
+            //code...
+            $request->validate(['title'=>'required', 'points'=>'required', 'company'=>'required', 'benefitId'=>'required']);
+            $benefit = Benefit::find($request->benefitId);
+            $benefit->update([
+                'title'=>$request->title,
+                'points_required'=>$request->points,
+                'company'=>$request->company
+            ]);
+            return response()->json(['status'=>true, 'benefit'=>$benefit]);
+        } catch (\Throwable $th) {
+            //throw $th;
+            return response()->json(['error'=>$th->getMessage()]);
+        }
+        
+    }
+public function deleteBenefit($id){
+    $benefit = Benefit::find($id);
+    $benefit->delete();
+    return response()->json(['status'=>true, 'benefit'=>$benefit]);
+}
     public function createOrganization(Request $request){
         try {
             //code...
@@ -302,9 +341,10 @@ public function updateHighlight(Request $request){
 public function createLink(Request $request){
     try {
         //code...
-        $request->validate(['url'=>'required|url']);
+        $request->validate(['url'=>'required|url','title'=>'required']);
        $link =  \App\Models\Link::create([
-            'url'=>$request->url
+            'url'=>$request->url,
+            'title'=>$request->title
         ]);
         return response()->json(['status'=>true, 'link'=>$link]);
     } catch (\Throwable $th) {

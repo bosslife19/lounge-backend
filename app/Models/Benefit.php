@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Link extends Model
+class Benefit extends Model
 {
-    protected $fillable = ['url', 'title'];
+    protected $guarded = [];
 }

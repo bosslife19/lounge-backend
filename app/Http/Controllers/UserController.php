@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Services\MentorMatchingService;
 use App\Mail\UserMatching;
+use App\Models\Benefit;
 use App\Models\BenfitRequest;
 use App\Models\Event;
 use App\Models\March;
@@ -206,6 +207,11 @@ class UserController extends Controller
     public function getLinks(Request $request){
     $links = \App\Models\Link::latest()->get();
     return response()->json(['status'=>true, 'links'=>$links]);
+}
+
+public function getBenefits(Request $request){
+    $benefits = Benefit::latest()->get();
+    return response()->json(['status'=>true, 'benefits'=>$benefits]);
 }
 
 public function editOrganization(Request $request)
